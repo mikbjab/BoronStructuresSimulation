@@ -1,39 +1,41 @@
 import json
 
+import numpy as np
+
 # Function of energy of a particle dependent on a number of his neighbors
 energy_table = [0., 1.7803, 5.1787, 5.6504, 6.2522, 6.5718, 6.5116]
 
 
 # calculating energy of given configuration with energy_table
-def energy_new(temp_red):
+def energy_with_table(red_positions):
     energy = 0.
-    for i in range(len(temp_red)):
+    for i in range(len(red_positions)):
         neighbours = 0
-        if [temp_red[i][0]-1,temp_red[i][1]] in temp_red:
+        if [red_positions[i][0] - 1, red_positions[i][1]] in red_positions:
             neighbours += 1
-        if [temp_red[i][0]+1,temp_red[i][1]] in temp_red:
+        if [red_positions[i][0] + 1, red_positions[i][1]] in red_positions:
             neighbours += 1
-        if [temp_red[i][0],temp_red[i][1]-1] in temp_red:
+        if [red_positions[i][0], red_positions[i][1] - 1] in red_positions:
             neighbours += 1
-        if [temp_red[i][0],temp_red[i][1]+1] in temp_red:
+        if [red_positions[i][0], red_positions[i][1] + 1] in red_positions:
             neighbours += 1
-        if [temp_red[i][0]+1,temp_red[i][1]-1] in temp_red:
+        if [red_positions[i][0] + 1, red_positions[i][1] - 1] in red_positions:
             neighbours += 1
-        if [temp_red[i][0]-1,temp_red[i][1]+1] in temp_red:
+        if [red_positions[i][0] - 1, red_positions[i][1] + 1] in red_positions:
             neighbours += 1
         energy += energy_table[neighbours]
-    return energy/len(temp_red)
+    return energy/len(red_positions)
 
 #calculating energy of given configuration using spring model with parameters in json file
-def energy_spring_from_file(temp_red, filename):
-    count=parameters_count(temp_red)
+def energy_spring_from_file(red_pos, filename):
+    count=parameters_count(red_pos)
     with open(filename,"r") as file:
         k_parameters=json.load(file)
         return energy_k(count,k_parameters["k1"],k_parameters["k2"],k_parameters["k3"])
 
 #calculating energy of given configuration using spring model with parameters explictly given
-def energy_spring_from_param(temp_red, param):
-    count=parameters_count(temp_red)
+def energy_spring_from_param(red_pos, param):
+    count=parameters_count(red_pos)
     return energy_k(count,param[0],param[1],param[2])
 
 #given that the distances d_nn,d_2nn,d_3nn are constant, to calculate the energy we only have to count
@@ -68,3 +70,13 @@ def parameters_count(red_points):
 
 def energy_k(count,k1,k2,k3):
     return count[0]*k1*3+count[1]*k2+count[2]*k3*4
+
+
+def optimization_function(k_parameters,grids,something):
+    num_of_grids=len(grids)
+    mean_square_err=0.
+    for i in range(num_of_grids):
+        true_value=energy_with_table(grids[i].grid[0])
+        guessed_value=energy_spring_from_param(grids[i].grid[0],k_parameters)
+        mean_square_err+=np.power(guessed_value-true_value,2)
+    return mean_square_err/num_of_grids

@@ -6,12 +6,13 @@ import numpy as np
 from src.util.GridFactory import GridFactory
 from src.util.viewGrid import printing_dots
 import src.util.fittingFunctions as fitFun
+from src.simulation import evolution
 
 
-def generate_structures(n,directory):
+def generate_structures(n,directory,num_steps=30000,num_mut=3):
     for i in range(n):
-        s = int(random.uniform(3, 9))
-        R = random.uniform(0.6 * s, 0.9 * s)
+        s = int(random.uniform(4, 9))
+        R = random.uniform(0.5 * s, 0.7 * s)
         N_blue = int(np.pi * R * R * random.uniform(0.1, 0.3))
         temp_data={"size":s,"radius":R,"number_blue":N_blue}
         grid=G.Grid(temp_data)
@@ -19,12 +20,14 @@ def generate_structures(n,directory):
         GridFactory.remove_outside_dots(grid)
         GridFactory.add_random_blue_dots(grid)
         printing_dots(grid,str(i),1)
-        GridFactory.save_grid(grid,f"../resources/{directory}/grid{i}.json")
+        temp_grid=evolution(grid,num_steps,num_mut)[-1]
+        printing_dots(temp_grid,str(i),1)
+        GridFactory.save_grid(temp_grid,f"../resources/{directory}/grid{i}.json")
 
 def MSE(guess,training_set):
     result=0
     for grid in training_set:
-        result+=(fitFun.energy_new(grid.grid[0])-fitFun.energy_k(fitFun.parameters_count(grid.grid[0]),guess[0],guess[1],guess[2]))**2
+        result+= (fitFun.energy_with_table(grid.grid[0]) - fitFun.energy_k(fitFun.parameters_count(grid.grid[0]), guess[0], guess[1], guess[2])) ** 2
     return result/len(training_set)
 
 def mutate(guess, custom_variance=1,uniform=False):
@@ -75,13 +78,13 @@ def random_walk(init_guess,steps,training_set,uniform=False):
 
 
 if __name__=="__main__":
-    num_of_training_structures=30
-    num_of_training_steps=1020
+    num_of_training_structures=10
+    num_of_training_steps=300
     num_of_population_members=20
-    generate_structures(num_of_training_structures,"training")
+    generate_structures(num_of_training_structures,"training_evolved")
     training_grids=[]
     for indexx in range(num_of_training_structures):
-        training_grids.append(GridFactory.create_from_json(f"../resources/training/grid{indexx}.json"))
+        training_grids.append(GridFactory.create_from_json(f"../resources/training_evolved/grid{indexx}.json"))
 
     k2=random.uniform(0.5,1)
     k1=random.uniform(0.0001,k2)

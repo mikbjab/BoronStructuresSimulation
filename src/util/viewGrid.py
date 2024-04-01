@@ -23,12 +23,14 @@ def printing_for_animation(grid, ax,R,l):
 
 def printing_dots(grid,title,fps):
     temp_red = np.array(grid.grid[0])
-    temp_blue = np.array(grid.grid[1])
     matrix = np.array([[1, 1 / np.sqrt(3)], [0, 1]])
     temp_red = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_red, 0, 1)), 0, 1)
-    temp_blue = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_blue, 0, 1)), 0, 1)
     plt.scatter(temp_red[:, 0], temp_red[:, 1], color="red")
-    plt.scatter(temp_blue[:, 0], temp_blue[:, 1], color="blue")
+    if grid.grid[1]:
+        temp_blue = np.array(grid.grid[1])
+        temp_blue = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_blue, 0, 1)), 0, 1)
+        plt.scatter(temp_blue[:, 0], temp_blue[:, 1], color="blue")
+
     theta = np.linspace(0, 2 * np.pi, 150)
     x_circle = grid.R * np.cos(theta)
     y_circle = grid.R * np.sin(theta)
