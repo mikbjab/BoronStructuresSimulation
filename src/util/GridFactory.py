@@ -141,48 +141,4 @@ class GridFactory:
 
 
 if __name__ == "__main__":
-    cell_grid_b36 = [[1, 0], [2, 0], [3, 0],
-                     [-1, 0], [-2, 0], [-3, 0],
-                     [0, 1], [1, 1], [2, 1],
-                     [-1,1], [-2, 1], [-3, 1],
-                     [0, 2], [1, 2], [-1, 2], [-2, 2], [-3, 2],
-                     [0, 3], [-1, 3], [-2, 3], [-3, 3],
-                     [0, -1], [-1, -1], [-2, -1],
-                     [1, -1], [2, -1], [3, -1],
-                     [0, -2], [-1, -2], [1, -2], [2, -2], [3, -2],
-                     [0, -3], [1, -3], [2, -3], [3, -3]
-                     ]
-    center_positions_b36=[[0,0],[3,3],[6,-3],[-3,6],[-6,3],[-3,-3],[3,-6]]
-    grid_b36=GridFactory.create_semiperiodic_grid_positions(cell_grid_b36,center_positions_b36)
-    view.printing_dots(grid_b36,"test b36",1)
-    cell_grid_beta12=[[0,0],[1,0],[2,0],[0,1],[1,1]]
-    vector_a_b12=[3,0]
-    vector_b_b12=[-1,2]
-    grid_beta12=GridFactory.create_semiperiodic_grid_vectors(cell_grid_beta12,vector_a_b12,vector_b_b12,range(-3,3),range(9))
-    view.printing_dots(grid_beta12,"test beta12",1)
-
-    cell_grid_s5 = [[1, 0], [2, 0],
-                     [-1, 0], [-2, 0],
-                     [0, 1], [1, 1],
-                     [-1,1], [-2, 1],
-                     [0, 2], [1, 2], [-1, 2], [-2, 2],
-                     [0, -1], [-1, -1],
-                     [1, -1], [2, -1],
-                     [0, -2], [1, -2], [2, -2]
-                     ]
-    vector_a_s5=[3,0]
-    vector_b_s5=[0,3]
-    grid_s5 = GridFactory.create_semiperiodic_grid_vectors(cell_grid_s5, vector_a_s5,vector_b_s5,range(-3,3),range(5))
-    view.printing_dots(grid_s5, "test s5", 1)
-
-    cell_grid_x3=[[1,0],[2,0],[-1,0],[-2,0],
-                  [1,1],[0,1],[-1,1],[-2,1],
-                  [2,-1],[1,-1],[0,-1],[-1,-1]]
-    vector_a_x3=[5,0]
-    vector_b_x3=[-1,2]
-    grid_x3 = GridFactory.create_semiperiodic_grid_vectors(cell_grid_x3, vector_a_x3,vector_b_x3,range(-3,3),range(5))
-    view.printing_dots(grid_x3, "test x3", 1)
-    GridFactory.save_grid(grid_beta12,"../resources/grid_beta12.json")
-    GridFactory.save_grid(grid_b36,"../resources/grid_b36.json")
-    GridFactory.save_grid(grid_x3,"../resources/grid_x3.json")
-    GridFactory.save_grid(grid_s5,"../resources/grid_s5.json")
+    pass
