@@ -4,7 +4,8 @@ import numpy as np
 from scipy.optimize import least_squares
 from matplotlib import pyplot as plt
 
-from src.util.fittingFunctions import energy_with_table, energy_spring_from_param, optimization_function
+from src.util.fittingFunctions import energy_with_table, energy_spring_from_param, optimization_function, \
+    optimization_function_least_square
 from src.util.GridFactory import GridFactory
 
 
@@ -12,15 +13,20 @@ from src.util.GridFactory import GridFactory
 if __name__=="__main__":
     training_grids=[]
     # 10 -> number of randomly generated grids
-    for index in range(10):
-        training_grids.append(GridFactory.create_from_json(f"../resources/training_selected/grid{index}.json"))
-    training_grids.extend(GridFactory.create_from_json_list("../resources/training_selected/gridList.json"))
+    # for index in range(10):
+    #     training_grids.append(GridFactory.create_from_json(f"../resources/training_selected/grid{index}.json"))
+    # training_grids.extend(GridFactory.create_from_json_list("../resources/training_selected/gridList.json"))
+
+    training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_b36.json"))
+    training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_beta12.json"))
+    training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_s5.json"))
+    training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_x3.json"))
     training_grids=np.array(training_grids)
     k2=random.uniform(0.5,1)
     k1=random.uniform(0.0001,k2)
     k3=random.uniform(0.0001,k1)
     initial_guess=[k1,k2,k3]
-    opt_result=least_squares(optimization_function,np.array(initial_guess),method="lm",args=(training_grids,1))
+    opt_result=least_squares(optimization_function_least_square,np.array(initial_guess),args=(training_grids,1))
     print(opt_result)
     optimal_param=opt_result.get("x")
     x_cordinate=np.arange(len(training_grids))

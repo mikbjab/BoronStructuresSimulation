@@ -2,6 +2,7 @@ import random
 import copy
 from src.util import parametersHandling, viewGrid, fittingFunctions
 from src.util.Grid import Grid
+from src.util.GridFactory import GridFactory
 
 
 # creating mutation
@@ -61,8 +62,7 @@ if __name__=="__main__":
     R=data["radius"]
     fps=data["steps"]
     num_of_mut=data["max_mut"]
-    first_grid=Grid(data)
-    first_grid.producing_red_blue_grid()
+    first_grid=GridFactory.create_from_json("resources/parameters.json")
     print(len(first_grid.grid[0]))
     #solution = evolution_spring(first_grid, fps, num_of_mut, "resources/least_square.json")
     solution =evolution(first_grid,fps,num_of_mut)

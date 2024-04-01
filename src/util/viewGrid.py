@@ -42,8 +42,3 @@ def printing_dots(grid,title,fps):
     plt.title(title+" N="+str(fps)+" L="+str(grid.l)+" #Blue="+str(grid.N_blue))
     plt.show()
 
-if __name__=="__main__":
-    data= parametersHandling.load_configuration("../resources/parameters.json")
-    test_grid=Grid(data)
-    test_grid.producing_red_blue_grid()
-    printing_dots(test_grid.grid,"test",data["radius"],data["size"])

@@ -80,3 +80,12 @@ def optimization_function(k_parameters,grids,something):
         guessed_value=energy_spring_from_param(grids[i].grid[0],k_parameters)
         mean_square_err+=np.power(guessed_value-true_value,2)
     return mean_square_err/num_of_grids
+
+def optimization_function_least_square(k_parameters,grids,something):
+    num_of_grids=len(grids)
+    difference_array=[]
+    for i in range(num_of_grids):
+        true_value=energy_with_table(grids[i].grid[0])
+        guessed_value=energy_spring_from_param(grids[i].grid[0],k_parameters)
+        difference_array.append(guessed_value-true_value)
+    return np.array(difference_array)/num_of_grids
