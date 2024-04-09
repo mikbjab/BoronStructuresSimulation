@@ -45,7 +45,7 @@ def genetic_algorithm(initial_population,num_of_members,steps,training_set):
         nucleus=choose_best(population,training_set)
     return nucleus
 
-def random_walk(init_guess,steps,training_set,uniform=False):
+def random_walk(init_guess,steps,training_set,uniform=True):
     parent_guess=copy.deepcopy(init_guess)
     for i in range(steps):
         parent_MSE=MSE(parent_guess,training_set)

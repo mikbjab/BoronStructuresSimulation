@@ -5,7 +5,7 @@ from src.fitParameters.fit_structures import generate_structures, MSE, random_wa
 from src.util.GridFactory import GridFactory
 
 if __name__=="__main__":
-    num_of_training_steps=10
+    num_of_training_steps=100
     training_grids=[]
     #10 -> number of randomly generated grids
     # for indexx in range(10):

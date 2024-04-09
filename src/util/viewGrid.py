@@ -39,6 +39,6 @@ def printing_dots(grid,title,fps):
     plt.xlim(-grid.l, grid.l)
     ax = plt.gca()
     ax.set_aspect(1)
-    plt.title(title+" N="+str(fps)+" L="+str(grid.l)+" #Blue="+str(grid.N_blue))
+    plt.title(title+" N="+str(fps)+" L="+str(grid.l)+" #Red="+str(len(grid.grid[0])))
     plt.show()
 

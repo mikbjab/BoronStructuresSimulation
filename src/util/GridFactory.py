@@ -1,5 +1,7 @@
 import json
+import math
 import random
+from tokenize import String
 from typing import List
 
 import src.util.Grid as Grid
@@ -13,7 +15,48 @@ class GridFactory:
         return Grid.Grid(parentGrid.data, new_positions)
 
     @staticmethod
-    def produce_default_red_grid(gridObject):
+    def produce_working_space(gridObject:Grid.Grid):
+        l=gridObject.l
+        r=gridObject.R
+        blue=[]
+        for i in range(-l,l):
+            for j in range(-l,l):
+                if i ** 2 + 2 * i * j / np.sqrt(3) + 4 * j ** 2 / 3 < r ** 2:
+                    blue.append([i,j])
+        gridObject.grid=[[],blue]
+
+    @staticmethod
+    def produce_uniform_grid(gridObject:Grid.Grid,percent_fill:float):
+        number_of_atoms=math.floor(len(gridObject.grid[1])*percent_fill)
+        l=gridObject.l
+        for i in range(number_of_atoms):
+            created=False
+            while not created:
+                x=random.randint(-l,l)
+                y=random.randint(-l,l)
+                if [x,y] in gridObject.grid[1]:
+                    gridObject.grid[1].remove([x,y])
+                    gridObject.grid[0].append([x,y])
+                    created=True
+
+    @staticmethod
+    def produce_gaussian_grid(gridObject:Grid.Grid,percent_fill:float,variance:float):
+        number_of_atoms=math.floor(len(gridObject.grid[1])*percent_fill)
+        l=gridObject.l
+        for i in range(number_of_atoms):
+            created=False
+            while not created:
+                x=int(random.gauss(0,variance*l))
+                y=int(random.gauss(0,variance*l))
+                if [x,y] in gridObject.grid[1]:
+                    gridObject.grid[1].remove([x,y])
+                    gridObject.grid[0].append([x,y])
+                    created=True
+
+
+
+    @staticmethod
+    def produce_default_red_grid(gridObject:Grid.Grid):
         l = gridObject.l
         R = gridObject.R
         # number in the grid indicates the type of dot in this place
@@ -42,11 +85,11 @@ class GridFactory:
                     gridObject.grid[1].append([i, j])
 
     @staticmethod
-    def add_random_blue_dots(gridObject):
+    def add_random_blue_dots(gridObject,percent:float=0.15):
         l = gridObject.l
 
         # creating blue dots from dots inside the circle
-        for i in range(gridObject.N_blue):
+        for i in range(int(percent*len(gridObject.grid[0]))):
             not_created = True
             while not_created:
                 x = random.randint(-l, l)
@@ -76,18 +119,16 @@ class GridFactory:
         with open(filename, "r") as file:
             parameters = json.load(file)
             if parameters["radius"] != -1:
-                tempGrid = Grid.Grid({"size": parameters["size"], "radius": parameters["radius"],
-                                      "number_blue": parameters["number_blue"]})
+                tempGrid = Grid.Grid({"size": parameters["size"], "radius": parameters["radius"]})
                 GridFactory.produce_default_red_grid(tempGrid)
                 GridFactory.remove_outside_dots(tempGrid)
             else:
-                tempGrid = Grid.Grid({"size": parameters["size"], "radius": parameters["radius"],
-                                      "number_blue": parameters["number_blue"]}, [parameters["dots"], []])
+                tempGrid = Grid.Grid({"size": parameters["size"], "radius": parameters["radius"]}, [parameters["dots"], []])
 
-            if parameters["number_blue"] != -1:
-                GridFactory.add_random_blue_dots(tempGrid)
-            else:
+            if "empty" in parameters:
                 GridFactory.add_given_blue_dots(tempGrid, parameters["empty"])
+            else:
+                GridFactory.add_random_blue_dots(tempGrid)
 
             return tempGrid
 
@@ -98,13 +139,11 @@ class GridFactory:
             list_grid = []
             for item in parameters_list:
                 if item["radius"] != -1:
-                    tempGrid = Grid.Grid({"size": item["size"], "radius": item["radius"],
-                                          "number_blue": -1})
+                    tempGrid = Grid.Grid({"size": item["size"], "radius": item["radius"]})
                     GridFactory.produce_default_red_grid(tempGrid)
                     GridFactory.remove_outside_dots(tempGrid)
                 else:
-                    tempGrid = Grid.Grid({"size": item["size"], "radius": item["radius"],
-                                          "number_blue": -1}, [item["dots"], []])
+                    tempGrid = Grid.Grid({"size": item["size"], "radius": item["radius"]}, [item["dots"], []])
                 GridFactory.add_given_blue_dots(tempGrid, [])
                 list_grid.append(tempGrid)
             return list_grid
@@ -139,6 +178,17 @@ class GridFactory:
             result.append(list(atom))
         return Grid.Grid({"size": 20, "radius": -1, "number_blue": -1}, [result, []])
 
+    @staticmethod
+    def create_random_gridObject(l:int, model:String, percent_fill:float, var:float=None):
+        tempGrid=Grid.Grid({"size":l,"radius":0.8*l})
+        GridFactory.produce_working_space(tempGrid)
+        if model=="uniform":
+            GridFactory.produce_uniform_grid(tempGrid, percent_fill)
+        elif model=="gauss":
+            variance=1 if var is None else var
+            GridFactory.produce_gaussian_grid(tempGrid, percent_fill,variance)
+        return tempGrid
+
 
 if __name__ == "__main__":
-    pass
+    view.printing_dots(GridFactory.create_random_gridObject(10,"gauss",0.3,0.000001),"1",1)

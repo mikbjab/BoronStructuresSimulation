@@ -19,6 +19,7 @@ if __name__=="__main__":
     training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_beta12.json"))
     training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_s5.json"))
     training_grids.append(GridFactory.create_from_json(f"../resources/structures/grid_x3.json"))
+    training_grids.extend(GridFactory.create_from_json_list(f"../resources/training_selected/gridList.json"))
     print("begin")
     opt_result=optimize.differential_evolution(optimization_function,[(0,2),(0,2),(0,2)],args=(training_grids,1),
                                                disp=True, init="sobol", maxiter=4000, popsize=50,atol=0.,

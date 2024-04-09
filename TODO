@@ -6,10 +6,12 @@ check structures
 implement distances
 github done
 
-increase space for grid
+
 !simulate before fitting spring model
 
-!count triangle and boundary structures
+!change space for simulation done
+!gaussian done (best around 0.3, when higher it becomes uniform)
+!count boundary structures done
 check
 
 search:
