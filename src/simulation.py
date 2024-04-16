@@ -2,9 +2,10 @@ import math
 import random
 import copy
 
+from src import analysis
 from src.util import parametersHandling, viewGrid, fittingFunctions
 from src.util.Grid import Grid
-from src.util.GridFactory import GridFactory
+import src.util.GridFactory as GridFactory
 
 
 # creating mutation
@@ -14,7 +15,7 @@ def mutation(parent: Grid, num_of_modifications, variance=4):
     num_of_blues = len(blue_positions)
     num_of_reds = len(red_positions)
     random.seed()
-    mutations=math.ceil(abs(random.gauss(0,num_of_modifications)))
+    mutations=random.randint(1,num_of_modifications)
     for i in range(mutations):
         random.seed()
         index_r = random.randint(0, num_of_reds - 1)
@@ -34,18 +35,18 @@ def evolution_genetic(parent,num_of_steps,num_of_mutations):
 
 
 def evolution(parent, num_of_steps, num_of_mutations):
-    first = copy.deepcopy(parent)
-    solv = [first]
-
-    for i in range(num_of_steps):
+    parent_energy=0
+    i=0
+    while i<num_of_steps or parent_energy<6.1:
         child = mutation(copy.deepcopy(parent), num_of_mutations)
         parent_energy = fittingFunctions.energy_with_table(parent.grid[0])
         child_energy = fittingFunctions.energy_with_table(child.grid[0])
         if child_energy >= parent_energy:
             parent = copy.deepcopy(child)
-            solv.append(copy.deepcopy(parent))
-            print(child_energy,i)
-    return solv
+            print(parent_energy,i)
+        i+=1
+
+    return parent
 
 def evolution_spring(parent, num_of_steps,num_of_mutations, filename):
     first = copy.deepcopy(parent)
@@ -99,11 +100,13 @@ if __name__=="__main__":
     fps=data["steps"]
     num_of_mut=data["max_mut"]
     first_grid=GridFactory.create_from_json("resources/parameters.json")
-    first_grid=GridFactory.create_random_gridObject(20,"uniform",0.3, 0.3)
-    #solution = evolution_spring(first_grid, fps, num_of_mut, [0.21300965581783415, 0.53, 0.045626050118300926])
+    first_grid=GridFactory.create_random_gridObject(15,"uniform",0.3, 0.3)
+    #solution = evolution_spring(first_grid, fps, num_of_mut, [0.13442410124025683, 1.1100909554658314, 0.004773775067342759])
     solution =evolution(first_grid,fps,num_of_mut)
-    viewGrid.printing_dots(solution[0], "first",R)
-    viewGrid.printing_dots(solution[-1], "last",R)
+    viewGrid.printing_dots(first_grid, "first",R)
+    viewGrid.printing_dots(solution, "last",R)
+    print("initial ratio: ",analysis.calculate_ratio(first_grid))
+    print("initial ratio: ",analysis.calculate_ratio(solution))
     # solv_population=evolution_population(first_grid,1000,4,30,fittingFunctions.energy_with_table)
     # for i in range(30):
     #     viewGrid.printing_dots(solv_population[i],f"{i}, {fittingFunctions.energy_with_table(solv_population[i].grid[0])}",0)

@@ -3,7 +3,7 @@ import json
 import random
 
 from src.util.generate_structures import generate_structures
-from src.util.GridFactory import GridFactory
+import src.util.GridFactory as GridFactory
 import src.util.fittingFunctions as fitFun
 
 

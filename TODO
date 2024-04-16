@@ -12,7 +12,9 @@ github done
 !change space for simulation done
 !gaussian done (best around 0.3, when higher it becomes uniform)
 !count boundary structures done
-check
+
+check first model, simulate structures with it
+calculate ratio
 
 search:
 module for matplotlib for visualisation of molecules

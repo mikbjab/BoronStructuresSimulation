@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from src.util.fittingFunctions import energy_with_table, energy_spring_from_param, optimization_function, \
     optimization_function_least_square
-from src.util.GridFactory import GridFactory
+import src.util.GridFactory as GridFactory
 
 
 

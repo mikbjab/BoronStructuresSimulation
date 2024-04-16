@@ -69,7 +69,7 @@ def parameters_count(red_points):
     return result_count
 
 def energy_k(count,k1,k2,k3):
-    return count[0]*k1*3+count[1]*k2+count[2]*k3*4
+    return count[0]*k1*3+count[1]*k2*1+count[2]*k3*4
 
 
 def optimization_function(k_parameters,grids,something):

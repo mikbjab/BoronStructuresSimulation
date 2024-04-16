@@ -1,6 +1,6 @@
 from src.util import viewGrid
 from src.util.Grid import Grid
-from src.util.GridFactory import GridFactory
+import src.util.GridFactory as GridFactory
 
 
 def count_triangles(grid: Grid):
