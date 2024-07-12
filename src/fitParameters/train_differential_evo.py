@@ -1,9 +1,5 @@
-import random
-
-import numpy as np
-
 from src.util.GridFactory import GridFactory
-from src.util.fittingFunctions import optimization_function
+from src.deprecated.fittingFunctions import optimization_function
 
 import scipy.optimize as optimize
 

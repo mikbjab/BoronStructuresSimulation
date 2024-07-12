@@ -144,7 +144,7 @@ def create_from_json_list(filename):
         return list_grid
 
 
-def save_grid(gridObject, filename):
+def save_grid(gridObject: Grid, filename):
     with open(filename, "w") as file:
         result_data = {"size": gridObject.l, "radius": -1, "number_blue": -1, "dots": gridObject.grid[0],
                        "empty": gridObject.grid[1]}

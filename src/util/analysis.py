@@ -1,3 +1,5 @@
+import math
+
 from src.util import viewGrid
 from src.util.Grid import Grid
 import src.util.GridFactory as GridFactory
@@ -35,10 +37,15 @@ def count_edges(grid: Grid):
     return edges
 
 def calculate_ratio(grid:Grid):
-    return count_edges(grid)/count_triangles(grid)
+    try:
+        ratio=count_edges(grid)/count_triangles(grid)
+        return ratio
+    except ZeroDivisionError as e:
+        return -1.
+
 
 if __name__=="__main__":
-    test_grid=GridFactory.create_from_json_list("resources/training_selected/gridList.json")[0]
+    test_grid=GridFactory.create_from_json_list("../../resources/training_selected/gridList.json")[0]
     viewGrid.printing_dots(test_grid,"test",1)
     print(count_triangles(test_grid))
     print(count_edges(test_grid))

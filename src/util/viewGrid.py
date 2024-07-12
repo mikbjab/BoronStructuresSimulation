@@ -4,26 +4,28 @@ import pyvista as pv
 import numpy as np
 
 from src import simulation
-from src.util import parametersHandling
+from src.util import models
 from src.util.Grid import Grid
 import src.util.GridFactory as GridFactory
 
-
-def printing_for_animation(grid, ax,R,l):
-    temp_red = np.array(grid[0])
-    temp_blue = np.array(grid[1])
+def save_grid(grid,title,filename):
+    temp_red = np.array(grid.grid[0])
     matrix = np.array([[1, 1 / np.sqrt(3)], [0, 1]])
     temp_red = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_red, 0, 1)), 0, 1)
-    temp_blue = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_blue, 0, 1)), 0, 1)
-    ax.clear()
-    ax.scatter(temp_red[:, 0], temp_red[:, 1], color="red")
-    ax.scatter(temp_blue[:, 0], temp_blue[:, 1], color="blue")
-    theta = np.linspace(0, 2 * np.pi, 150)
-    x_circle = R * np.cos(theta)
-    y_circle = R * np.sin(theta)
-    ax.plot(x_circle, y_circle, color="grey")
-    ax.set_ylim(-l, l)
-    ax.set_xlim(-l, l)
+    plt.scatter(temp_red[:, 0], temp_red[:, 1], color="red")
+    if grid.grid[1]:
+        temp_blue = np.array(grid.grid[1])
+        temp_blue = np.swapaxes(np.matmul(matrix, np.swapaxes(temp_blue, 0, 1)), 0, 1)
+        plt.scatter(temp_blue[:, 0], temp_blue[:, 1], color="blue")
+
+    plt.ylim(-grid.l, grid.l)
+    plt.xlim(-grid.l, grid.l)
+    plt.xticks([])
+    plt.yticks([])
+    ax = plt.gca()
+    ax.set_aspect(1)
+    plt.title(title)
+    plt.savefig(filename)
 
 def printing_dots(grid,title,fps):
     temp_red = np.array(grid.grid[0])
@@ -43,10 +45,10 @@ def printing_dots(grid,title,fps):
     plt.xlim(-grid.l, grid.l)
     ax = plt.gca()
     ax.set_aspect(1)
-    plt.title(title+" N="+str(fps)+" L="+str(grid.l)+" #Red="+str(len(grid.grid[0])))
+    plt.title(title+" #Atoms="+str(len(grid.grid[0])))
     plt.show()
 
-def print_3d_grid(grid:Grid,R=1.,space_R=-0.1,r=0.3,space_r=1.5,distance_z=1.6):
+def print_3d_grid(grid:Grid,R=1.,space_R=-0.1,r=0.5,space_r=1.,distance_z=1.6, filename="grid.svg"):
     pv.set_plot_theme("document")
     a=2*R+space_R
     background_atoms = []
@@ -68,37 +70,37 @@ def print_3d_grid(grid:Grid,R=1.,space_R=-0.1,r=0.3,space_r=1.5,distance_z=1.6):
         if [atom[0] - 1, atom[1]] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0]-0.5) * a_boron + atom[1] * a_boron / 2, atom[1] * a_boron * np.sqrt(3) / 2, distance_z),
-                radius=0.5*r,
+                radius=0.4*r,
                 height=a_boron))
         if [atom[0] + 1, atom[1]] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0] + 0.5) * a_boron + atom[1] * a_boron / 2, atom[1] * a_boron * np.sqrt(3) / 2, distance_z),
-                radius=0.5*r,
+                radius=0.4*r,
                 height=a_boron))
         if [atom[0], atom[1] - 1] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0]) * a_boron + (atom[1]-0.5) * a_boron / 2, (atom[1]-0.5) * a_boron * np.sqrt(3) / 2, distance_z),
-                radius=0.5*r,
+                radius=0.4*r,
                 height=a_boron,
                 direction=(a_boron / 2,a_boron * np.sqrt(3) / 2,0)))
         if [atom[0], atom[1] + 1] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0]) * a_boron + (atom[1] + 0.5) * a_boron / 2, (atom[1] + 0.5) * a_boron * np.sqrt(3) / 2, distance_z),
-                radius=0.5*r,
+                radius=0.6*r,
                 height=a_boron,
                 direction=(a_boron / 2,a_boron * np.sqrt(3) / 2,0)))
         if [atom[0] + 1, atom[1] - 1] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0]+0.5) * a_boron + (atom[1] - 0.5) * a_boron / 2, (atom[1] - 0.5) * a_boron * np.sqrt(3) / 2,
                 distance_z),
-                radius=0.5*r,
+                radius=0.6*r,
                 height=a_boron,
                 direction=(-a_boron / 2,a_boron * np.sqrt(3) / 2,0)))
         if [atom[0] - 1, atom[1] + 1] in grid.grid[0]:
             boron_atoms.append(pv.Cylinder((
                 (atom[0]-0.5) * a_boron + (atom[1] + 0.5) * a_boron / 2, (atom[1] + 0.5) * a_boron * np.sqrt(3) / 2,
                 distance_z),
-                radius=0.5*r,
+                radius=0.6*r,
                 height=a_boron,
                 direction=(-a_boron / 2,a_boron * np.sqrt(3) / 2,0)))
 
@@ -130,11 +132,17 @@ def print_3d_grid(grid:Grid,R=1.,space_R=-0.1,r=0.3,space_r=1.5,distance_z=1.6):
     for edge in boron_edges:
         pl.add_mesh(edge,color="red")
     for triangle in triangles:
-        pl.add_mesh(triangle,color="red",opacity=0.3)
-    pl.show()
+        pl.add_mesh(triangle,color="red",opacity=0.4)
+
+    pl.camera.position=(0.,0.,90.)
+    pl.camera.Roll(-90.)
+    pl.show(screenshot=filename)
+
+
 
 if __name__=="__main__":
-    temp_grid=GridFactory.create_random_gridObject(15,"gauss",0.3,0.3)
-    printing_dots(temp_grid,"1",1)
-    temp_grid=simulation.evolution(temp_grid,10000,3)
-    print_3d_grid(temp_grid)
+    param=[-4e-7,1.8601,0.1919]
+    temp_grid=GridFactory.create_from_json("../../resources/cluster_-++.json")
+    save_grid(temp_grid,f"{param}\n"
+                        f"E={float('{:.5}'.format(models.model_clusters_basic(temp_grid,param)))} eV",f"C:/Users/miko9/Desktop/cluster_{param}.jpg")
+    print("done")

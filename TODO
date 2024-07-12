@@ -5,16 +5,16 @@ fit parameters
 check structures
 implement distances
 github done
+gaussian done (best around 0.3, when higher it becomes uniform)
+!simulate before fitting spring model done
+!check first model, simulate structures with it done
+->add more structures -> goal: around 1000
+spring model, force negative coefficients
 
+warunek na parametry
+cluster expansion method and three body model (different configurations)
 
-!simulate before fitting spring model
-
-!change space for simulation done
-!gaussian done (best around 0.3, when higher it becomes uniform)
-!count boundary structures done
-
-check first model, simulate structures with it
-calculate ratio
+dopracować histogram ratio
 
 search:
 module for matplotlib for visualisation of molecules
@@ -27,3 +27,13 @@ static charging of 2 dimensional systems
 of graphene
 
 boron planar clusters
+
+model osadzania
+
+maksymalizujemy binding energy
+
+ujemne parametry są małe, czyli model stara się zminimalizować niefizyczność tego
+
+
+anizotropia rezultatów
+

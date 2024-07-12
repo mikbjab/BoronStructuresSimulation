@@ -1,15 +1,14 @@
-import math
 import random
 import copy
 
-from src import analysis
-from src.util import parametersHandling, viewGrid, fittingFunctions
+from src.util import parametersHandling, viewGrid, analysis, models
+from src.deprecated import fittingFunctions
 from src.util.Grid import Grid
 import src.util.GridFactory as GridFactory
 
 
 # creating mutation
-def mutation(parent: Grid, num_of_modifications, variance=4):
+def mutation(parent: Grid, num_of_modifications):
     red_positions = parent.grid[0]
     blue_positions = parent.grid[1]
     num_of_blues = len(blue_positions)
@@ -34,13 +33,21 @@ def evolution_genetic(parent,num_of_steps,num_of_mutations):
 
 
 
-def evolution(parent, num_of_steps, num_of_mutations):
+def evolution(parent, num_of_steps, num_of_mutations,model=models.model_table,param=[],energy_condition=True):
     parent_energy=0
     i=0
-    while i<num_of_steps or parent_energy<6.1:
+    param_flag=False
+    if model is not models.model_table:
+        param_flag=True
+
+    while i<num_of_steps or (energy_condition and parent_energy<6.1):
         child = mutation(copy.deepcopy(parent), num_of_mutations)
-        parent_energy = fittingFunctions.energy_with_table(parent.grid[0])
-        child_energy = fittingFunctions.energy_with_table(child.grid[0])
+        if param_flag:
+            parent_energy = model(parent,param)
+            child_energy = model(child,param)
+        else:
+            parent_energy=model(parent)
+            child_energy=model(child)
         if child_energy >= parent_energy:
             parent = copy.deepcopy(child)
             print(parent_energy,i)
@@ -50,7 +57,6 @@ def evolution(parent, num_of_steps, num_of_mutations):
 
 def evolution_spring(parent, num_of_steps,num_of_mutations, filename):
     first = copy.deepcopy(parent)
-    solv = [first]
 
     for i in range(num_of_steps):
         child = mutation(copy.deepcopy(parent), num_of_mutations)
@@ -58,9 +64,10 @@ def evolution_spring(parent, num_of_steps,num_of_mutations, filename):
         child_energy = fittingFunctions.energy_spring_from_param(child.grid[0], filename)
         if child_energy >= parent_energy:
             parent = copy.deepcopy(child)
-            solv.append(copy.deepcopy(parent))
             print(child_energy, i)
-    return solv
+    return parent
+
+
 
 def evolution_population(parent, num_of_steps, num_of_swap, population_size,model):
     first = copy.deepcopy(parent)
@@ -89,24 +96,58 @@ def evolution_population(parent, num_of_steps, num_of_swap, population_size,mode
         counter+=1
     return population
 
+def simulate_anisotropic(parent,num_of_steps,num_of_swap, coeff_matrix):
+    for i in range(num_of_steps):
+        child = mutation(copy.deepcopy(parent), num_of_swap)
+        parent_energy = fittingFunctions.anisotropic_model(parent, coeff_matrix)
+        child_energy = fittingFunctions.anisotropic_model(child, coeff_matrix)
+        if child_energy >= parent_energy:
+            parent = copy.deepcopy(child)
+            print(child_energy, i)
+    return parent
+
+def simulate_clusters(parent,num_of_steps,num_of_swap, coefficients):
+    for i in range(num_of_steps):
+        child = mutation(copy.deepcopy(parent), num_of_swap)
+        parent_energy = fittingFunctions.clusters_model_basic(parent, coefficients)
+        child_energy = fittingFunctions.clusters_model_basic(child, coefficients)
+        if child_energy >= parent_energy:
+            parent = copy.deepcopy(child)
+            print(child_energy, i)
+    return parent
 
 
+def weird_simulate_clusters(parent,num_of_steps,num_of_swap, coefficients):
+    for i in range(num_of_steps):
+        child = mutation(copy.deepcopy(parent), num_of_swap)
+        parent_energy = fittingFunctions.clusters_model_basic(parent, coefficients)
+        child_energy = fittingFunctions.clusters_model_basic(child, coefficients)
+        if abs(child_energy-6.53)<abs(parent_energy-6.53):
+            parent = copy.deepcopy(child)
+            print(child_energy, i)
+    return parent
 
 
 if __name__=="__main__":
-    data= parametersHandling.load_configuration("resources/parameters.json")
+    data= parametersHandling.load_configuration("../resources/parameters.json")
     l=data["size"]
     R=data["radius"]
-    fps=data["steps"]
+    fps=100000
     num_of_mut=data["max_mut"]
-    first_grid=GridFactory.create_from_json("resources/parameters.json")
-    first_grid=GridFactory.create_random_gridObject(15,"uniform",0.3, 0.3)
-    #solution = evolution_spring(first_grid, fps, num_of_mut, [0.13442410124025683, 1.1100909554658314, 0.004773775067342759])
-    solution =evolution(first_grid,fps,num_of_mut)
-    viewGrid.printing_dots(first_grid, "first",R)
-    viewGrid.printing_dots(solution, "last",R)
-    print("initial ratio: ",analysis.calculate_ratio(first_grid))
-    print("initial ratio: ",analysis.calculate_ratio(solution))
+    first_grid=GridFactory.create_from_json("test_grid.json")
+    viewGrid.printing_dots(first_grid, "test grid ",R)
+    solution = evolution(first_grid, fps, num_of_mut
+                         ,model=models.model_spring
+                         ,param=[-0.475234201367123, 2.046648324829256, -0.01679292882896216]
+                         ,energy_condition=False)
+    #[0.213803468494253, 0.5826535997946278, 0.09733891086066418] 0.2 MSE
+    #[0.009738352045112635, 1.3621416202976369, 0.00024772030574858465] 0.053029140859907384
+    #solution1 =evolution(first_grid,fps,num_of_mut)
+    viewGrid.printing_dots(solution, "spring first",R)
+    viewGrid.save_grid(solution,"spring-++","spring-++.jpg")
+    #viewGrid.printing_dots(solution1, "initial model",R)
+    print("initial ratio: ", analysis.calculate_ratio(first_grid))
+    print("final ratio: ", analysis.calculate_ratio(solution))
     # solv_population=evolution_population(first_grid,1000,4,30,fittingFunctions.energy_with_table)
     # for i in range(30):
     #     viewGrid.printing_dots(solv_population[i],f"{i}, {fittingFunctions.energy_with_table(solv_population[i].grid[0])}",0)
