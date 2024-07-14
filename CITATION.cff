@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Jabłoński
+    given-names: Mikołaj
+title: "2D boron planar structure simulation"
+version: 1.0
+identifiers:
+date-released: 2024-07-14
